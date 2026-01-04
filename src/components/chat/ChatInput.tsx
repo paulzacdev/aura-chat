@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -37,35 +37,36 @@ export function ChatInput({ onSend, disabled, streaming }: ChatInputProps) {
   }, [message]);
 
   return (
-    <div className="p-4 border-t border-border bg-background">
-      <div className="max-w-3xl mx-auto">
-        <div className="relative flex items-end gap-2 bg-card border border-border rounded-xl p-2">
+    <div className="p-4 md:p-6 bg-gradient-to-t from-background via-background to-transparent">
+      <div className="max-w-3xl mx-auto space-y-3">
+        <div className="relative flex items-end gap-3 bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl p-3 shadow-lg shadow-black/5 transition-all focus-within:border-primary/30 focus-within:shadow-primary/5">
           <Textarea
             ref={textareaRef}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Écrivez votre message..."
+            placeholder="Posez votre question sur la foi catholique..."
             disabled={disabled || streaming}
-            className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pr-12"
+            className="min-h-[48px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pr-2 text-base placeholder:text-muted-foreground/60"
             rows={1}
           />
           <Button
             size="icon"
             onClick={handleSubmit}
             disabled={!message.trim() || disabled || streaming}
-            className="shrink-0 h-10 w-10 rounded-lg"
+            className="shrink-0 h-11 w-11 rounded-xl shadow-sm"
           >
             {streaming ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              <Send className="h-4 w-4" />
+              <Send className="h-5 w-5" />
             )}
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground text-center mt-2">
-          L'IA peut faire des erreurs. Vérifiez les informations importantes.
-        </p>
+        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
+          <Sparkles className="h-3 w-3" />
+          <span>Théologia est un assistant IA. Vérifiez les informations avec le Catéchisme et le Magistère.</span>
+        </div>
       </div>
     </div>
   );
