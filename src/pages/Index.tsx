@@ -78,7 +78,7 @@ const Index = () => {
   }, [selectedConversation, sendMessage, messages.length, updateConversation]);
 
   return (
-    <div className="h-screen flex bg-background dark">
+    <div className="h-screen flex bg-background dark overflow-hidden">
       <Sidebar
         conversations={conversations}
         selectedId={selectedConversationId}
