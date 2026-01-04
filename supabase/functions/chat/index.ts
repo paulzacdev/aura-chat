@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -28,13 +27,6 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-// Model mapping to Lovable AI gateway models
-const MODEL_MAP: Record<string, string> = {
-  'gpt-4-mini': 'google/gemini-2.5-flash-lite',
-  'gpt-5': 'openai/gpt-5',
-  'gpt-oss-120b': 'google/gemini-2.5-flash',
-};
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -60,66 +52,65 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      console.error('LOVABLE_API_KEY is not configured');
+    console.log(`Chat request - Model: ${model}, ConversationId: ${conversationId}, Messages: ${messages.length}`);
+
+    // Get the n8n webhook URL from environment
+    const N8N_WEBHOOK_URL = Deno.env.get('N8N_WEBHOOK_URL');
+    
+    if (!N8N_WEBHOOK_URL) {
+      console.error('N8N_WEBHOOK_URL is not configured');
       return new Response(
-        JSON.stringify({ error: 'AI service is not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ 
+          error: 'Service non configuré. Veuillez configurer le webhook n8n.',
+          content: 'Le service IA n\'est pas encore configuré. Configurez N8N_WEBHOOK_URL dans les secrets.'
+        }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Map user-selected model to actual gateway model
-    const gatewayModel = MODEL_MAP[model] || 'google/gemini-2.5-flash';
-    console.log(`Using model: ${gatewayModel} (user selected: ${model})`);
-
-    // Prepare messages with system prompt
-    const systemMessage = {
-      role: 'system',
-      content: `Tu es un assistant IA polyvalent, intelligent et serviable. Tu réponds de manière claire, précise et concise. Tu peux aider avec la programmation, l'analyse de données, la rédaction, la recherche et bien plus encore. Tu es capable de raisonner de façon logique et de fournir des explications détaillées quand c'est nécessaire.`
-    };
-
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    // Forward request to n8n webhook
+    const response = await fetch(N8N_WEBHOOK_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: gatewayModel,
-        messages: [systemMessage, ...messages],
-        stream: true,
+        messages,
+        model,
+        conversationId,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('AI gateway error:', response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: 'Le service IA est temporairement surchargé. Réessayez dans quelques instants.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: 'Crédits IA insuffisants.' }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
+      console.error('n8n webhook error:', response.status, errorText);
       
       return new Response(
-        JSON.stringify({ error: 'Erreur du service IA' }),
+        JSON.stringify({ error: 'Erreur du service n8n' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Stream the response
-    return new Response(response.body, {
-      headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
-    });
+    // Check if n8n returns streaming or JSON
+    const contentType = response.headers.get('content-type') || '';
+    
+    if (contentType.includes('text/event-stream')) {
+      // Stream the response directly
+      return new Response(response.body, {
+        headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
+      });
+    } else {
+      // Handle JSON response from n8n and convert to SSE format
+      const data = await response.json();
+      const content = data.content || data.response || data.message || JSON.stringify(data);
+      
+      // Create SSE formatted response
+      const sseData = `data: ${JSON.stringify({ choices: [{ delta: { content } }] })}\n\ndata: [DONE]\n\n`;
+      
+      return new Response(sseData, {
+        headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
+      });
+    }
 
   } catch (error) {
     console.error('Chat function error:', error);
