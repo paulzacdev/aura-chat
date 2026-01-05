@@ -109,6 +109,98 @@
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary;
   }
+
+  /* Radial gradient for 3D depth */
+  .bg-gradient-radial {
+    background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
+  }
+
+  /* Futuristic glass morphism */
+  .glass-panel {
+    @apply bg-background/60 backdrop-blur-2xl border border-primary/10;
+    box-shadow: 
+      0 0 40px -10px hsl(var(--primary) / 0.15),
+      inset 0 1px 0 0 hsl(var(--primary) / 0.1);
+  }
+
+  .glass-card {
+    @apply bg-card/70 backdrop-blur-xl border border-border/50;
+    box-shadow: 
+      0 8px 32px -8px hsl(0 0% 0% / 0.3),
+      0 0 20px -10px hsl(var(--primary) / 0.2),
+      inset 0 1px 0 0 hsl(var(--primary) / 0.05);
+  }
+
+  /* Neon glow effects */
+  .glow-sm {
+    box-shadow: 0 0 15px -3px hsl(var(--primary) / 0.4);
+  }
+
+  .glow-md {
+    box-shadow: 
+      0 0 20px -5px hsl(var(--primary) / 0.3),
+      0 0 40px -10px hsl(var(--primary) / 0.2);
+  }
+
+  .glow-lg {
+    box-shadow: 
+      0 0 30px -5px hsl(var(--primary) / 0.4),
+      0 0 60px -15px hsl(var(--primary) / 0.3),
+      0 0 100px -30px hsl(var(--primary) / 0.2);
+  }
+
+  /* Text glow */
+  .text-glow {
+    text-shadow: 0 0 20px hsl(var(--primary) / 0.5);
+  }
+
+  /* Animated border glow */
+  .border-glow {
+    position: relative;
+  }
+
+  .border-glow::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.3), transparent, hsl(var(--primary) / 0.1));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    padding: 1px;
+    pointer-events: none;
+  }
+
+  /* Holographic shimmer */
+  .holographic {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary) / 0.1) 0%,
+      hsl(var(--accent) / 0.05) 25%,
+      hsl(var(--primary) / 0.1) 50%,
+      hsl(var(--accent) / 0.05) 75%,
+      hsl(var(--primary) / 0.1) 100%
+    );
+    background-size: 400% 400%;
+    animation: holographic-shift 8s ease infinite;
+  }
+
+  @keyframes holographic-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Floating animation */
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
 }
 
 /* Markdown styles for chat */

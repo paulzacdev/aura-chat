@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { Sidebar } from '@/components/chat/Sidebar';
 import { ChatWindow } from '@/components/chat/ChatWindow';
+import { Background3D } from '@/components/3d/Background3D';
 import { useConversations } from '@/hooks/useConversations';
 import { useMessages } from '@/hooks/useMessages';
 import type { ModelType } from '@/types/chat';
@@ -78,7 +79,12 @@ const Index = () => {
   }, [selectedConversation, sendMessage, messages.length, updateConversation]);
 
   return (
-    <div className="h-screen flex bg-background dark overflow-hidden">
+    <div className="h-screen flex bg-background dark overflow-hidden relative">
+      {/* 3D Background */}
+      <Suspense fallback={null}>
+        <Background3D />
+      </Suspense>
+
       <Sidebar
         conversations={conversations}
         selectedId={selectedConversationId}
@@ -90,7 +96,7 @@ const Index = () => {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
       />
       
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 relative z-10">
         <ChatWindow
           conversation={selectedConversation}
           messages={messages}

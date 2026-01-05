@@ -71,24 +71,24 @@ export function Sidebar({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed md:relative inset-y-0 left-0 z-40 w-72 bg-sidebar border-r border-sidebar-border flex flex-col transition-all duration-300 ease-out",
+          "fixed md:relative inset-y-0 left-0 z-40 w-72 glass-panel flex flex-col transition-all duration-300 ease-out",
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
         {/* Header with branding */}
-        <div className="p-5 border-b border-sidebar-border">
+        <div className="p-5 border-b border-primary/10">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center border border-primary/20">
-              <Cross className="h-5 w-5 text-primary" />
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/30 to-accent/20 flex items-center justify-center border border-primary/30 glow-sm float">
+              <Cross className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="font-serif text-lg font-semibold text-foreground">Théologia</h1>
+              <h1 className="font-serif text-xl font-semibold text-foreground text-glow">Théologia</h1>
               <p className="text-xs text-muted-foreground">Assistant en théologie</p>
             </div>
           </div>
           <Button
             onClick={onCreate}
-            className="w-full justify-center gap-2 h-11 rounded-xl font-medium shadow-sm"
+            className="w-full justify-center gap-2 h-12 rounded-xl font-medium glow-sm border border-primary/30 bg-primary/90 hover:bg-primary transition-all duration-300"
           >
             <Plus className="h-4 w-4" />
             Nouvelle conversation
@@ -115,18 +115,18 @@ export function Sidebar({
                 <div
                   key={conversation.id}
                   className={cn(
-                    "group flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200",
+                    "group flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300",
                     selectedId === conversation.id
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
-                      : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
+                      ? "glass-card glow-sm"
+                      : "hover:bg-primary/5 text-sidebar-foreground"
                   )}
                   onClick={() => onSelect(conversation.id)}
                 >
                   <div className={cn(
-                    "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors",
+                    "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300",
                     selectedId === conversation.id
-                      ? "bg-primary/10 text-primary"
-                      : "bg-muted/50 text-muted-foreground"
+                      ? "bg-primary/20 text-primary glow-sm"
+                      : "bg-muted/30 text-muted-foreground"
                   )}>
                     <BookOpen className="h-4 w-4" />
                   </div>
@@ -183,9 +183,9 @@ export function Sidebar({
         </ScrollArea>
 
         {/* Footer */}
-        <div className="p-4 border-t border-sidebar-border">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground justify-center">
-            <Sparkles className="h-3.5 w-3.5 text-primary/60" />
+        <div className="p-4 border-t border-primary/10">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground justify-center glass-card px-4 py-2 rounded-xl">
+            <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
             <span>Agent RAG externe via n8n</span>
           </div>
         </div>
