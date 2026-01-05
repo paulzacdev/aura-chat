@@ -58,27 +58,31 @@ export function ChatWindow({
   if (!conversation) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8">
-        <div className="max-w-md text-center space-y-8">
+        <div className="max-w-lg text-center space-y-8 glass-panel p-10 rounded-3xl border-glow">
           <div className="relative">
-            <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl flex items-center justify-center border border-primary/20 shadow-lg shadow-primary/10">
-              <Cross className="w-10 h-10 text-primary" />
+            <div className="w-24 h-24 mx-auto bg-gradient-to-br from-primary/20 to-accent/10 rounded-3xl flex items-center justify-center border border-primary/30 glow-lg float">
+              <Cross className="w-12 h-12 text-primary" />
             </div>
-            <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-card rounded-xl flex items-center justify-center border border-border shadow-sm">
-              <Sparkles className="w-4 h-4 text-primary" />
+            <div className="absolute -bottom-2 -right-2 w-10 h-10 glass-card rounded-xl flex items-center justify-center glow-sm">
+              <Sparkles className="w-5 h-5 text-primary animate-pulse" />
             </div>
           </div>
-          <div className="space-y-3">
-            <h2 className="text-3xl font-serif font-semibold text-foreground">Bienvenue sur Théologia</h2>
-            <p className="text-muted-foreground leading-relaxed">
+          <div className="space-y-4">
+            <h2 className="text-4xl font-serif font-semibold text-foreground text-glow">Bienvenue sur Théologia</h2>
+            <p className="text-muted-foreground leading-relaxed text-lg">
               Votre assistant en théologie catholique, alimenté par l'intelligence artificielle pour vous aider à explorer et approfondir votre foi.
             </p>
           </div>
-          <Button onClick={onNewConversation} size="lg" className="gap-2 h-12 px-6 rounded-xl shadow-lg shadow-primary/20">
+          <Button 
+            onClick={onNewConversation} 
+            size="lg" 
+            className="gap-2 h-14 px-8 rounded-2xl glow-md border border-primary/30 bg-primary/90 hover:bg-primary transition-all duration-300 text-lg"
+          >
             <MessageSquarePlus className="h-5 w-5" />
             Commencer une conversation
           </Button>
-          <div className="pt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5 text-primary/60" />
+          <div className="pt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground glass-card px-4 py-2 rounded-xl mx-auto w-fit">
+            <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
             <span>Agent RAG externe — Interface sécurisée</span>
           </div>
         </div>
@@ -94,13 +98,13 @@ export function ChatWindow({
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <div className="flex items-center justify-between px-4 md:px-6 py-4 glass-panel border-b border-primary/10">
         <div className="flex items-center gap-3 ml-12 md:ml-0">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center border border-primary/10">
-            <BookOpen className="h-4 w-4 text-primary" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/10 flex items-center justify-center border border-primary/20 glow-sm">
+            <BookOpen className="h-5 w-5 text-primary" />
           </div>
           <div className="min-w-0">
-            <h1 className="font-medium truncate max-w-[180px] sm:max-w-none text-foreground">
+            <h1 className="font-medium truncate max-w-[180px] sm:max-w-none text-foreground text-lg">
               {conversation.title}
             </h1>
           </div>

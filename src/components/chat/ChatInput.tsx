@@ -37,9 +37,9 @@ export function ChatInput({ onSend, disabled, streaming }: ChatInputProps) {
   }, [message]);
 
   return (
-    <div className="p-4 md:p-6 bg-gradient-to-t from-background via-background to-transparent">
+    <div className="p-4 md:p-6 bg-gradient-to-t from-background via-background/80 to-transparent">
       <div className="max-w-3xl mx-auto space-y-3">
-        <div className="relative flex items-end gap-3 bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl p-3 shadow-lg shadow-black/5 transition-all focus-within:border-primary/30 focus-within:shadow-primary/5">
+        <div className="relative flex items-end gap-3 glass-card rounded-2xl p-3 transition-all duration-300 focus-within:glow-sm border-glow">
           <Textarea
             ref={textareaRef}
             value={message}
@@ -54,7 +54,7 @@ export function ChatInput({ onSend, disabled, streaming }: ChatInputProps) {
             size="icon"
             onClick={handleSubmit}
             disabled={!message.trim() || disabled || streaming}
-            className="shrink-0 h-11 w-11 rounded-xl shadow-sm"
+            className="shrink-0 h-12 w-12 rounded-xl glow-sm border border-primary/30 bg-primary/90 hover:bg-primary transition-all duration-300"
           >
             {streaming ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -63,8 +63,8 @@ export function ChatInput({ onSend, disabled, streaming }: ChatInputProps) {
             )}
           </Button>
         </div>
-        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
-          <Sparkles className="h-3 w-3" />
+        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70 glass-card px-4 py-2 rounded-xl mx-auto w-fit">
+          <Sparkles className="h-3 w-3 text-primary animate-pulse" />
           <span>Théologia est un assistant IA. Vérifiez les informations avec le Catéchisme et le Magistère.</span>
         </div>
       </div>

@@ -13,10 +13,10 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
 
   if (isSystem) {
     return (
-      <div className="flex justify-center py-6 px-4 animate-fade-in">
-        <div className="max-w-lg bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10 rounded-2xl p-5 text-center">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-            <Sparkles className="h-5 w-5 text-primary" />
+      <div className="flex justify-center py-8 px-4 animate-fade-in">
+        <div className="max-w-lg glass-panel rounded-3xl p-6 text-center border-glow glow-md">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/10 flex items-center justify-center mx-auto mb-4 glow-sm float">
+            <Sparkles className="h-6 w-6 text-primary" />
           </div>
           <div className="prose-chat text-sm">
             {message.content.split('\n').map((line, i) => (
@@ -34,24 +34,24 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
   return (
     <div
       className={cn(
-        "flex gap-4 py-6 px-4 md:px-6 animate-fade-in transition-colors",
-        isUser ? "bg-transparent" : "bg-card/30"
+        "flex gap-4 py-6 px-4 md:px-6 animate-fade-in transition-all duration-300",
+        isUser ? "bg-transparent" : "glass-panel border-y border-primary/5"
       )}
     >
       <div className="max-w-3xl mx-auto w-full flex gap-4">
         {/* Avatar */}
         <div
           className={cn(
-            "shrink-0 w-9 h-9 rounded-xl flex items-center justify-center shadow-sm",
+            "shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
             isUser 
-              ? "bg-gradient-to-br from-secondary to-muted text-foreground" 
-              : "bg-gradient-to-br from-primary/20 to-accent/20 text-primary border border-primary/10"
+              ? "bg-gradient-to-br from-secondary/80 to-muted/60 text-foreground border border-border/50" 
+              : "bg-gradient-to-br from-primary/30 to-accent/20 text-primary border border-primary/30 glow-sm"
           )}
         >
           {isUser ? (
-            <User className="h-4 w-4" />
+            <User className="h-5 w-5" />
           ) : (
-            <Sparkles className="h-4 w-4" />
+            <Sparkles className="h-5 w-5" />
           )}
         </div>
 
@@ -60,12 +60,12 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
           <div className="flex items-center gap-2">
             <span className={cn(
               "text-xs font-semibold",
-              isUser ? "text-muted-foreground" : "text-primary"
+              isUser ? "text-muted-foreground" : "text-primary text-glow"
             )}>
               {isUser ? 'Vous' : 'Théologia'}
             </span>
             {!isUser && (
-              <span className="text-[10px] text-muted-foreground/60 bg-muted/50 px-1.5 py-0.5 rounded-full">
+              <span className="text-[10px] text-muted-foreground/80 glass-card px-2 py-0.5 rounded-full">
                 Agent RAG
               </span>
             )}
