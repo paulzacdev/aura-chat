@@ -54,30 +54,22 @@ serve(async (req) => {
 
     console.log(`Chat request - Model: ${model}, ConversationId: ${conversationId}, Messages: ${messages.length}`);
 
-    // Get the n8n webhook URL from environment
-    const N8N_WEBHOOK_URL = Deno.env.get('N8N_WEBHOOK_URL');
+    // Production n8n webhook URL
+    const N8N_WEBHOOK_URL = 'https://jujucats.app.n8n.cloud/webhook/ai-agent-rag';
     
-    if (!N8N_WEBHOOK_URL) {
-      console.error('N8N_WEBHOOK_URL is not configured');
-      return new Response(
-        JSON.stringify({ 
-          error: 'Service non configuré. Veuillez configurer le webhook n8n.',
-          content: 'Le service IA n\'est pas encore configuré. Configurez N8N_WEBHOOK_URL dans les secrets.'
-        }),
-        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    // Get the last user message as query
+    const lastUserMessage = messages.filter((m: any) => m.role === 'user').pop();
+    const query = lastUserMessage?.content || '';
 
-    // Forward request to n8n webhook
+    // Forward request to n8n webhook with correct format
     const response = await fetch(N8N_WEBHOOK_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        messages,
-        model,
-        conversationId,
+        query: query,
+        sessionId: conversationId || 'anonymous',
       }),
     });
 
