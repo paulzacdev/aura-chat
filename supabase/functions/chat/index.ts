@@ -92,9 +92,28 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
       });
     } else {
-      // Handle JSON response from n8n and convert to SSE format
-      const data = await response.json();
-      const content = data.content || data.response || data.message || JSON.stringify(data);
+      // Handle JSON or text response from n8n
+      const responseText = await response.text();
+      console.log('n8n response:', responseText);
+      
+      if (!responseText || responseText.trim() === '') {
+        return new Response(
+          JSON.stringify({ error: 'Réponse vide du service n8n' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      let content = responseText;
+      
+      // Try to parse as JSON if it looks like JSON
+      if (responseText.trim().startsWith('{') || responseText.trim().startsWith('[')) {
+        try {
+          const data = JSON.parse(responseText);
+          content = data.output || data.content || data.response || data.message || data.text || responseText;
+        } catch (e) {
+          console.log('Response is not valid JSON, using as plain text');
+        }
+      }
       
       // Create SSE formatted response
       const sseData = `data: ${JSON.stringify({ choices: [{ delta: { content } }] })}\n\ndata: [DONE]\n\n`;
