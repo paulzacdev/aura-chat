@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
 import { Sidebar } from '@/components/chat/Sidebar';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { Background3D } from '@/components/3d/Background3D';
@@ -6,9 +6,9 @@ import { useConversations } from '@/hooks/useConversations';
 import { useMessages } from '@/hooks/useMessages';
 import type { ModelType } from '@/types/chat';
 
-const Index = () => {
+export default function Chat() {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const {
     conversations,
@@ -36,55 +36,54 @@ const Index = () => {
   }, [conversations, conversationsLoading, selectedConversationId]);
 
   const handleNewConversation = useCallback(async () => {
-    const newConversation = await createConversation('gpt-5');
+    const newConversation = await createConversation();
     if (newConversation) {
       setSelectedConversationId(newConversation.id);
-      setSidebarOpen(false);
     }
   }, [createConversation]);
 
   const handleSelectConversation = useCallback((id: string) => {
     setSelectedConversationId(id);
-    setSidebarOpen(false);
   }, []);
 
-  const handleRenameConversation = useCallback((id: string, title: string) => {
-    updateConversation(id, { title });
+  const handleRenameConversation = useCallback(async (id: string, title: string) => {
+    await updateConversation(id, { title });
   }, [updateConversation]);
 
-  const handleDeleteConversation = useCallback((id: string) => {
-    deleteConversation(id);
+  const handleDeleteConversation = useCallback(async (id: string) => {
+    await deleteConversation(id);
     if (selectedConversationId === id) {
       const remaining = conversations.filter(c => c.id !== id);
       setSelectedConversationId(remaining.length > 0 ? remaining[0].id : null);
     }
-  }, [deleteConversation, conversations, selectedConversationId]);
+  }, [deleteConversation, selectedConversationId, conversations]);
 
-  const handleModelChange = useCallback((model: ModelType) => {
+  const handleModelChange = useCallback(async (model: ModelType) => {
     if (selectedConversationId) {
-      updateConversation(selectedConversationId, { model });
+      await updateConversation(selectedConversationId, { model });
     }
   }, [selectedConversationId, updateConversation]);
 
-  const handleSendMessage = useCallback((content: string) => {
-    if (selectedConversation) {
-      sendMessage(content, selectedConversation.model);
-      
-      // Auto-rename conversation with first message
-      if (messages.length === 0) {
-        const title = content.slice(0, 50) + (content.length > 50 ? '...' : '');
-        updateConversation(selectedConversation.id, { title });
+  const handleSendMessage = useCallback(async (content: string) => {
+    const model = selectedConversation?.model as ModelType || 'gpt-5';
+    if (!selectedConversationId) {
+      // Create new conversation if none selected
+      const newConversation = await createConversation();
+      if (newConversation) {
+        setSelectedConversationId(newConversation.id);
+        await sendMessage(content, model);
       }
+    } else {
+      await sendMessage(content, model);
     }
-  }, [selectedConversation, sendMessage, messages.length, updateConversation]);
+  }, [selectedConversationId, selectedConversation, createConversation, sendMessage]);
 
   return (
-    <div className="h-screen flex bg-background dark overflow-hidden relative">
-      {/* 3D Background */}
+    <div className="h-screen flex overflow-hidden bg-background relative">
       <Suspense fallback={null}>
         <Background3D />
       </Suspense>
-
+      
       <Sidebar
         conversations={conversations}
         selectedId={selectedConversationId}
@@ -95,21 +94,17 @@ const Index = () => {
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
       />
-      
-      <main className="flex-1 flex flex-col min-w-0 relative z-10">
-        <ChatWindow
-          conversation={selectedConversation}
-          messages={messages}
-          loading={messagesLoading}
-          streaming={streaming}
-          error={error}
-          onSendMessage={handleSendMessage}
-          onModelChange={handleModelChange}
-          onNewConversation={handleNewConversation}
-        />
-      </main>
+
+      <ChatWindow
+        conversation={selectedConversation}
+        messages={messages}
+        loading={messagesLoading}
+        streaming={streaming}
+        error={error}
+        onSendMessage={handleSendMessage}
+        onModelChange={handleModelChange}
+        onNewConversation={handleNewConversation}
+      />
     </div>
   );
-};
-
-export default Index;
+}
