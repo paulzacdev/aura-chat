@@ -102,7 +102,7 @@ export default function Welcome() {
           <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center glow-sm">
             <Cross className="w-5 h-5 text-primary" />
           </div>
-          <span className="font-serif text-xl font-semibold text-foreground">Théologia</span>
+          <span className="font-serif text-xl font-semibold text-foreground">Tauphile</span>
         </div>
         
         <div className="flex items-center gap-3">
@@ -171,7 +171,7 @@ export default function Welcome() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-serif font-bold text-foreground mb-6 leading-tight">
-            <span className="text-gradient text-glow">Théologia</span>
+            <span className="text-gradient text-glow">Tauphile</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground mb-4 font-light max-w-2xl mx-auto">
@@ -234,7 +234,7 @@ export default function Welcome() {
       {/* Footer */}
       <footer className="relative z-10 text-center py-8 border-t border-border/30">
         <p className="text-sm text-muted-foreground">
-          Théologia • {t.footer}
+          Tauphile • {t.footer}
         </p>
       </footer>
     </div>

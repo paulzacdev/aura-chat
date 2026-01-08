@@ -95,7 +95,7 @@ export default function Auth() {
             </h1>
             <p className="text-muted-foreground">
               {isSignUp 
-                ? 'Rejoignez Théologia pour explorer la foi' 
+                ? 'Rejoignez Tauphile pour explorer la foi' 
                 : 'Retrouvez vos conversations spirituelles'}
             </p>
           </div>

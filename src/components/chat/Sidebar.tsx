@@ -82,7 +82,7 @@ export function Sidebar({
               <Cross className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="font-serif text-xl font-semibold text-foreground text-glow">Théologia</h1>
+              <h1 className="font-serif text-xl font-semibold text-foreground text-glow">Tauphile</h1>
               <p className="text-xs text-muted-foreground">Assistant en théologie</p>
             </div>
           </div>
