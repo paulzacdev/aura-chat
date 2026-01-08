@@ -65,7 +65,7 @@ export function ChatInput({ onSend, disabled, streaming }: ChatInputProps) {
         </div>
         <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70 glass-card px-4 py-2 rounded-xl mx-auto w-fit">
           <Sparkles className="h-3 w-3 text-primary animate-pulse" />
-          <span>Théologia est un assistant IA. Vérifiez les informations avec le Catéchisme et le Magistère.</span>
+          <span>Tauphile est un assistant IA. Vérifiez les informations avec le Catéchisme et le Magistère.</span>
         </div>
       </div>
     </div>

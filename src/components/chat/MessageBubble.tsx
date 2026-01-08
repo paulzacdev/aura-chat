@@ -62,7 +62,7 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
               "text-xs font-semibold",
               isUser ? "text-muted-foreground" : "text-primary text-glow"
             )}>
-              {isUser ? 'Vous' : 'Théologia'}
+              {isUser ? 'Vous' : 'Tauphile'}
             </span>
             {!isUser && (
               <span className="text-[10px] text-muted-foreground/80 glass-card px-2 py-0.5 rounded-full">

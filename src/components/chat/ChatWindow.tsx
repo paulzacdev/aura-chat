@@ -23,7 +23,7 @@ const WELCOME_MESSAGE: Message = {
   id: 'welcome-system',
   conversation_id: '',
   role: 'system',
-  content: `Bienvenue dans Théologia, votre assistant en théologie catholique. 🕊️
+  content: `Bienvenue dans Tauphile, votre assistant en théologie catholique. 🕊️
 
 Pour mieux vous accompagner dans votre exploration de la foi, pourriez-vous m'indiquer votre niveau de connaissance du christianisme ?
 
@@ -68,7 +68,7 @@ export function ChatWindow({
             </div>
           </div>
           <div className="space-y-4">
-            <h2 className="text-4xl font-serif font-semibold text-foreground text-glow">Bienvenue sur Théologia</h2>
+            <h2 className="text-4xl font-serif font-semibold text-foreground text-glow">Bienvenue sur Tauphile</h2>
             <p className="text-muted-foreground leading-relaxed text-lg">
               Votre assistant en théologie catholique, alimenté par l'intelligence artificielle pour vous aider à explorer et approfondir votre foi.
             </p>
