@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Cross, Mail, Lock, User, ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Background3D } from '@/components/3d/Background3D';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
@@ -24,8 +27,28 @@ export default function Auth() {
     }
   }, [isAuthenticated, authLoading, navigate]);
 
+  const handleCaptchaVerify = (token: string) => {
+    setCaptchaToken(token);
+  };
+
+  const handleCaptchaExpire = () => {
+    setCaptchaToken(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isSignUp) {
+      if (!displayName.trim()) {
+        toast.error('Le nom est requis');
+        return;
+      }
+      if (!captchaToken) {
+        toast.error('Veuillez compléter le captcha');
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -37,6 +60,9 @@ export default function Auth() {
           } else {
             toast.error(error.message);
           }
+          // Reset captcha on error
+          captchaRef.current?.resetCaptcha();
+          setCaptchaToken(null);
         } else {
           toast.success('Compte créé avec succès !');
           navigate('/chat');
@@ -104,7 +130,9 @@ export default function Auth() {
           <form onSubmit={handleSubmit} className="glass-panel rounded-2xl p-8 space-y-6">
             {isSignUp && (
               <div className="space-y-2">
-                <Label htmlFor="displayName" className="text-foreground">Nom d'affichage</Label>
+                <Label htmlFor="displayName" className="text-foreground">
+                  Nom <span className="text-destructive">*</span>
+                </Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
@@ -113,6 +141,7 @@ export default function Auth() {
                     placeholder="Votre nom"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
+                    required={isSignUp}
                     className="pl-10 bg-background/50 border-border/50 focus:border-primary"
                   />
                 </div>
@@ -120,7 +149,9 @@ export default function Auth() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">Email</Label>
+              <Label htmlFor="email" className="text-foreground">
+                Email <span className="text-destructive">*</span>
+              </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -136,7 +167,9 @@ export default function Auth() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">Mot de passe</Label>
+              <Label htmlFor="password" className="text-foreground">
+                Mot de passe <span className="text-destructive">*</span>
+              </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -152,9 +185,22 @@ export default function Auth() {
               </div>
             </div>
 
+            {/* hCaptcha for signup */}
+            {isSignUp && (
+              <div className="flex justify-center">
+                <HCaptcha
+                  ref={captchaRef}
+                  sitekey="10000000-ffff-ffff-ffff-000000000001"
+                  onVerify={handleCaptchaVerify}
+                  onExpire={handleCaptchaExpire}
+                  theme="dark"
+                />
+              </div>
+            )}
+
             <Button
               type="submit"
-              disabled={loading}
+              disabled={loading || (isSignUp && !captchaToken)}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground glow-sm"
             >
               {loading ? (
@@ -169,7 +215,11 @@ export default function Auth() {
             <div className="text-center">
               <button
                 type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setCaptchaToken(null);
+                  captchaRef.current?.resetCaptcha();
+                }}
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 {isSignUp 

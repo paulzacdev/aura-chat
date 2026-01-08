@@ -4,8 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
-import { ModelSelector } from './ModelSelector';
-import type { Message, Conversation, ModelType } from '@/types/chat';
+import type { Message, Conversation } from '@/types/chat';
 
 interface ChatWindowProps {
   conversation: Conversation | null;
@@ -14,7 +13,6 @@ interface ChatWindowProps {
   streaming: boolean;
   error: string | null;
   onSendMessage: (message: string) => void;
-  onModelChange: (model: ModelType) => void;
   onNewConversation: () => void;
 }
 
@@ -42,7 +40,6 @@ export function ChatWindow({
   streaming,
   error,
   onSendMessage,
-  onModelChange,
   onNewConversation,
 }: ChatWindowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -98,7 +95,7 @@ export function ChatWindow({
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 md:px-6 py-4 glass-panel border-b border-primary/10">
+      <div className="flex items-center px-4 md:px-6 py-4 glass-panel border-b border-primary/10">
         <div className="flex items-center gap-3 ml-12 md:ml-0">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/10 flex items-center justify-center border border-primary/20 glow-sm">
             <BookOpen className="h-5 w-5 text-primary" />
@@ -109,10 +106,6 @@ export function ChatWindow({
             </h1>
           </div>
         </div>
-        <ModelSelector
-          selectedModel={conversation.model}
-          onSelect={onModelChange}
-        />
       </div>
 
       {/* Messages */}
