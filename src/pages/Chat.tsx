@@ -1,14 +1,24 @@
 import { useState, useCallback, useEffect, Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sidebar } from '@/components/chat/Sidebar';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { Background3D } from '@/components/3d/Background3D';
 import { useConversations } from '@/hooks/useConversations';
 import { useMessages } from '@/hooks/useMessages';
-import type { ModelType } from '@/types/chat';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Chat() {
+  const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/auth');
+    }
+  }, [authLoading, isAuthenticated, navigate]);
 
   const {
     conversations,
@@ -58,25 +68,26 @@ export default function Chat() {
     }
   }, [deleteConversation, selectedConversationId, conversations]);
 
-  const handleModelChange = useCallback(async (model: ModelType) => {
-    if (selectedConversationId) {
-      await updateConversation(selectedConversationId, { model });
-    }
-  }, [selectedConversationId, updateConversation]);
-
   const handleSendMessage = useCallback(async (content: string) => {
-    const model = selectedConversation?.model as ModelType || 'gpt-5';
     if (!selectedConversationId) {
       // Create new conversation if none selected
       const newConversation = await createConversation();
       if (newConversation) {
         setSelectedConversationId(newConversation.id);
-        await sendMessage(content, model);
+        await sendMessage(content, 'google/gemini-2.5-flash');
       }
     } else {
-      await sendMessage(content, model);
+      await sendMessage(content, 'google/gemini-2.5-flash');
     }
-  }, [selectedConversationId, selectedConversation, createConversation, sendMessage]);
+  }, [selectedConversationId, createConversation, sendMessage]);
+
+  if (authLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex overflow-hidden bg-background relative">
@@ -102,7 +113,6 @@ export default function Chat() {
         streaming={streaming}
         error={error}
         onSendMessage={handleSendMessage}
-        onModelChange={handleModelChange}
         onNewConversation={handleNewConversation}
       />
     </div>

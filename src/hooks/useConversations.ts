@@ -1,17 +1,26 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { Conversation, ModelType } from '@/types/chat';
+import type { Conversation } from '@/types/chat';
+import { useAuth } from '@/hooks/useAuth';
 
 export function useConversations() {
+  const { user } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchConversations = useCallback(async () => {
+    if (!user) {
+      setConversations([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('conversations')
         .select('*')
+        .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
@@ -22,17 +31,22 @@ export function useConversations() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchConversations();
   }, [fetchConversations]);
 
-  const createConversation = useCallback(async (model: ModelType = 'gpt-5'): Promise<Conversation | null> => {
+  const createConversation = useCallback(async (): Promise<Conversation | null> => {
+    if (!user) return null;
+
     try {
       const { data, error } = await supabase
         .from('conversations')
-        .insert({ model, title: 'Nouvelle conversation' })
+        .insert({ 
+          title: 'Nouvelle conversation',
+          user_id: user.id,
+        })
         .select()
         .single();
 
@@ -46,7 +60,7 @@ export function useConversations() {
       setError('Erreur lors de la création de la conversation');
       return null;
     }
-  }, []);
+  }, [user]);
 
   const updateConversation = useCallback(async (id: string, updates: Partial<Conversation>) => {
     try {

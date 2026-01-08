@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { Message, ModelType } from '@/types/chat';
+import type { Message } from '@/types/chat';
 
 export function useMessages(conversationId: string | null) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -36,7 +36,7 @@ export function useMessages(conversationId: string | null) {
     fetchMessages();
   }, [fetchMessages]);
 
-  const sendMessage = useCallback(async (content: string, model: ModelType) => {
+  const sendMessage = useCallback(async (content: string, model: string = 'google/gemini-2.5-flash') => {
     if (!conversationId || !content.trim()) return;
 
     setError(null);
