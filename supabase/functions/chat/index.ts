@@ -61,24 +61,48 @@ serve(async (req) => {
     const lastUserMessage = messages.filter((m: any) => m.role === 'user').pop();
     const query = lastUserMessage?.content || '';
 
-    // Forward request to n8n webhook with correct format
-    const response = await fetch(N8N_WEBHOOK_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: query,
-        sessionId: conversationId || 'anonymous',
-      }),
-    });
+    // Forward request to n8n webhook with correct format and timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+
+    let response;
+    try {
+      response = await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: query,
+          sessionId: conversationId || 'anonymous',
+        }),
+        signal: controller.signal,
+      });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      console.error('n8n fetch error:', fetchError);
+      
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        return new Response(
+          JSON.stringify({ error: 'Le service a mis trop de temps à répondre. Veuillez réessayer.' }),
+          { status: 504, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      return new Response(
+        JSON.stringify({ error: 'Impossible de contacter le service n8n. Veuillez réessayer plus tard.' }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('n8n webhook error:', response.status, errorText);
       
       return new Response(
-        JSON.stringify({ error: 'Erreur du service n8n' }),
+        JSON.stringify({ error: `Erreur du service n8n (${response.status})` }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -94,12 +118,13 @@ serve(async (req) => {
     } else {
       // Handle JSON or text response from n8n
       const responseText = await response.text();
-      console.log('n8n response:', responseText);
+      console.log('n8n response:', responseText.substring(0, 200));
       
       if (!responseText || responseText.trim() === '') {
+        console.error('n8n returned empty response');
         return new Response(
-          JSON.stringify({ error: 'Réponse vide du service n8n' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          JSON.stringify({ error: 'Le service est temporairement indisponible. Veuillez réessayer dans quelques instants.' }),
+          { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
       
