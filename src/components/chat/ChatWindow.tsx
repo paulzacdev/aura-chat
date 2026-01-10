@@ -3,6 +3,7 @@ import { MessageSquarePlus, Cross, Sparkles, BookOpen } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { MessageBubble } from './MessageBubble';
+import { ThinkingIndicator } from './ThinkingIndicator';
 import { ChatInput } from './ChatInput';
 import type { Message, Conversation } from '@/types/chat';
 
@@ -121,13 +122,18 @@ export function ChatWindow({
               </div>
             </div>
           ) : (
-            displayMessages.map((message, index) => (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                isStreaming={streaming && index === displayMessages.length - 1 && message.role === 'assistant'}
-              />
-            ))
+            <>
+              {displayMessages.map((message, index) => (
+                <MessageBubble
+                  key={message.id}
+                  message={message}
+                  isStreaming={streaming && index === displayMessages.length - 1 && message.role === 'assistant'}
+                />
+              ))}
+              {streaming && displayMessages[displayMessages.length - 1]?.role === 'user' && (
+                <ThinkingIndicator />
+              )}
+            </>
           )}
         </div>
       </ScrollArea>
