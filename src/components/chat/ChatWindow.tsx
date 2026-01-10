@@ -1,6 +1,5 @@
 import { useRef, useEffect } from 'react';
 import { MessageSquarePlus, Cross, Sparkles, BookOpen } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { MessageBubble } from './MessageBubble';
 import { ThinkingIndicator } from './ThinkingIndicator';
@@ -45,12 +44,12 @@ export function ChatWindow({
 }: ChatWindowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive or streaming changes
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, streaming]);
 
   // Empty state
   if (!conversation) {
@@ -110,7 +109,7 @@ export function ChatWindow({
       </div>
 
       {/* Messages */}
-      <ScrollArea ref={scrollRef} className="flex-1 scrollbar-thin">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar-thin">
         <div className="divide-y divide-border/30">
           {loading ? (
             <div className="py-16 text-center">
@@ -130,13 +129,13 @@ export function ChatWindow({
                   isStreaming={streaming && index === displayMessages.length - 1 && message.role === 'assistant'}
                 />
               ))}
-              {streaming && displayMessages[displayMessages.length - 1]?.role === 'user' && (
+              {streaming && (!displayMessages.length || displayMessages[displayMessages.length - 1]?.role === 'user') && (
                 <ThinkingIndicator />
               )}
             </>
           )}
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Error message */}
       {error && (
