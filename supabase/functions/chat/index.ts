@@ -55,7 +55,7 @@ serve(async (req) => {
     console.log(`Chat request - Model: ${model}, ConversationId: ${conversationId}, Messages: ${messages.length}`);
 
     // Production n8n webhook URL
-    const N8N_WEBHOOK_URL = 'https://nutrimind.app.n8n.cloud/webhook/ai-agent-rag';
+    const N8N_WEBHOOK_URL = 'https://victorelliot31.app.n8n.cloud/webhook/ai-agent-rag';
     
     // Get the last user message as query
     const lastUserMessage = messages.filter((m: any) => m.role === 'user').pop();
